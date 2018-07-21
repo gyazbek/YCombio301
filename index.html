@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>YCombio - Hackernews browser</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+    <link href="assets/css/style.css" rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <header>
+        <nav>
+            <span class="logo left">YCombio</span>
+            <a class="modal-link" data-modal-ref="about" href="#about">About</a>
+            <input class="right search" type="text" placeholder="Search"/>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <div class="container">
+                <div class="filter">
+                <label for="ptype">Viewing <select id="ptype">
+                    <option value="top">Top</option>
+                    <option value="new">Newest</option>
+                    <option value="best">Best</option></select></label>
+                </div>
+                <div class="posts" id="posts">
+                </div>
+                <div class="loadmore">
+                    <a href="">Load More</a>   
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <div class="modal" id="about">
+        <div class="container">
+            <div class="header">
+                <span class="close">&times;</span>
+                <h3>About</h3>
+            </div>
+            <hr>
+            <div class="content">
+                <p>
+                    Hi there. I am Gui Yazbek, and this website is a project for the 201d43 class demonstrating the use of HTML, CSS, and JavaScript
+                    to build for the modern web.
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script id="post-template" type="text/x-handlebars-template">
+        <div class="post">
+            <span class="score">{{score}}</span>
+            <div class="header">
+                <div class="title"><a href="{{url}}">{{title}}</a></div>
+                <div class="links">{{pluralCommentCount descendants 'comment' 'comments'}} | {{by}}</div>
+          </div>
+        </div>
+      </script>
+    <script>
+        Handlebars.registerHelper('pluralize', function(number, singular, plural) {
+            if (number === 1)
+                return singular;
+            else
+                return (typeof plural === 'string' ? plural : singular + 's');
+        });
+            
+        Handlebars.registerHelper('pluralCommentCount', function(number, singular, plural) {    
+            return number+' '+Handlebars.helpers.pluralize.apply(this, arguments);
+        });
+
+        var postTemplate = Handlebars.compile(document.getElementById("post-template").innerHTML);
+        var $ph = $("#posts");
+        loadStories = function(type, start, end){
+            $.getJSON('https://hacker-news.firebaseio.com/v0/' + type + 'stories.json', function(json) {
+                for (var i = start; i < Math.min(json.length, end); i++) {
+                    (function(i) {
+                        $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + json[i] + '.json', function(json2) {
+                            $ph.append(postTemplate(json2));
+                        });
+                    })(i);
+                }
+            });
+        }
+        loadStories('top', 0, 20);
+
+        $( "#ptype" ).change(function() {
+            $ph.empty();
+            loadStories($( this ).val(), 0, 20);
+        });
+    </script>
+</body>
+</html>
