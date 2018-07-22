@@ -39,46 +39,8 @@ h6 {
   font-weight: 700;
 }
 
-header,
-footer {
-  text-align: left;
-  color: #f9f9f9;
-}
-
-footer {
-  position: relative;
-  height: 150px;
-}
-
-nav {
-  padding: 10px;
-  background: #ff6600;
-  color: #fff;
-  height: 50px;
-  text-align: center;
-  font-size: 1.1em;
-}
-
-nav a {
-  color: white;
-  font-size: 1.2em;
-}
-
-nav ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  color: white;
-}
-
-nav ul li a {
-  color: white;
-  text-decoration: none;
-}
-
-nav ul li {
-  display: inline;
-  color: white;
+.about-link {
+  margin-left: 150px;
 }
 
 * {
@@ -95,20 +57,11 @@ input[type=text] {
   border-radius: 4px;
 }
 
-section {
-  margin-top: 50px;
-}
-
 .container {
   width: 100%;
   box-sizing: border-box;
   padding-right: 20px;
   padding-left: 20px;
-}
-
-hr {
-  border: 0;
-  border-top: 1px solid #ccc;
 }
 
 /* helper classes */
@@ -292,4 +245,55 @@ header nav .search {
     top: 0;
     opacity: 1;
   }
+}
+
+header,
+footer {
+  text-align: left;
+  color: #f9f9f9;
+}
+
+footer {
+  position: relative;
+  height: 150px;
+}
+
+nav {
+  padding: 10px;
+  background: #ff6600;
+  color: #fff;
+  height: 50px;
+  text-align: center;
+  font-size: 1.1em;
+}
+
+nav a {
+  color: white;
+  font-size: 1.2em;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  color: white;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+nav ul li {
+  display: inline;
+  color: white;
+}
+
+section {
+  margin-top: 50px;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #ccc;
 }
