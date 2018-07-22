@@ -86,15 +86,6 @@ gulp.task('js-app', function() {
     .pipe(reload({stream:true}));
 });
 
-gulp.task('js-libs', function() {
-  gulp.src([bases.app + 'js/libs/*.js', '!' + bases.app + 'js/libs/modernizr.js'])
-    .pipe(uglify())
-    .pipe(size({ gzip: true, showFiles: true }))
-    .pipe(concat('libs.js'))
-    .pipe(gulp.dest(bases.dist + 'js'))
-    .pipe(reload({stream:true}));
-});
-
 
 gulp.task('sass-lint', function() {
   gulp.src([bases.app + 'scss/**/*.scss', '!' + bases.app + 'scss/libs/**/*.scss', '!' + bases.app + 'scss/states/_print.scss'])
@@ -111,19 +102,17 @@ gulp.task('minify-html', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch(bases.app + 'scss/**/*.scss', ['styles']);
-  gulp.watch(bases.app + './*.html', ['minify-html']);
+    gulp.watch(bases.app + 'scss/**/*.scss', ['styles']);
+    gulp.watch(bases.app + 'js/*.js', ['js-app']);
+    gulp.watch(bases.app + './*.html', ['minify-html']);
 });
 
 gulp.task('default', function(done) {
-  runSequence('clean:dist', 'browser-sync', 'js-app', 'js-libs', 'minify-html', 'styles', 'themes', 'watch', done);
+  runSequence('clean:dist', 'browser-sync', 'js-app','minify-html', 'styles', 'themes', 'watch', done);
 });
 
 gulp.task('build', function(done) {
-  runSequence('clean:dist', 'js-app', 'js-libs', 'minify-html', 'styles', done);
+  runSequence('clean:dist', 'js-app', 'minify-html', 'styles', done);
 });
 
-gulp.task('deploy', function() {
-    return gulp.src(bases.dist)
-      .pipe(deploy());
-  });
+gulp.task('deploy', () => gulp.src('./dist/**/*').pipe(deploy()));
