@@ -107,133 +107,23 @@
             </ul>
         </script>
         <script>
-            Handlebars.registerHelper('pluralize', function (number, singular, plural) {
-                if (number === 1)
-                    return singular;
-                else
-                    return (typeof plural === 'string' ? plural : singular + 's');
-            });
-
-            Handlebars.registerHelper('pluralCommentCount', function (number, singular, plural) {
-                return number + ' ' + Handlebars.helpers.pluralize.apply(this, arguments);
-            });
-
-            var $app = $("#app");
-            var postsTemplate = Handlebars.compile(document.getElementById("posts-template").innerHTML);
-            var postTemplate = Handlebars.compile(document.getElementById("post-template").innerHTML);
-            var commentsTemplate = Handlebars.compile(document.getElementById("comments-template").innerHTML);
-            var commentTemplate = Handlebars.compile(document.getElementById("commenttemplate").innerHTML);
-            var commentNested = Handlebars.compile(document.getElementById("commentnested").innerHTML);
-
-
-            Handlebars.registerPartial('commentnested', commentNested);
-
-            var limit_start = 0;
-
-            loadStories = function (container, type, start, end) {
-                var dfd = new $.Deferred();
-                var totalCount = 0;
-                $.getJSON('https://hacker-news.firebaseio.com/v0/' + type + 'stories.json', function (json) {
-                    totalCount += Math.min(json.length, end - start);
-                    for (var i = start; i < Math.min(json.length, end); i++) {
-                        (function (i) {
-                            $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + json[i] + '.json',
-                                function (json2) {
-                                    var $post = $(postTemplate(json2));
-                                    $post.find(".load-comments-link").click(function () {
-                                        renderComments(json[i], json2.kids);
-                                    });
-                                    container.append($post);
-                                    totalCount -= 1;
-                                    if (totalCount == 0) {
-                                        dfd.resolve();
-                                    }
-                                });
-                        })(i);
-                    }
+                Handlebars.registerHelper('pluralize', function (number, singular, plural) {
+                    if (number === 1)
+                        return singular;
+                    else
+                        return (typeof plural === 'string' ? plural : singular + 's');
                 });
-                return dfd.promise();
-            }
-
-            loadComments = function (container, comments) {
-                if (comments && comments.length > 0) {
-                    loadCommentsTree(comments).done(function (data) {
-                        console.log(data);
-                        container.append(commentTemplate({
-                            items: data
-                        }));
-                    });
-                }
-            }
-
-            function Comment(by, text, items) {
-                this.by = by;
-                this.text = text;
-                this.items = items;
-            }
-
-            loadCommentsTree = function (comments) {
-                var dfd = new $.Deferred();
-                var nTree = [];
-                for (var i = 0; i < comments.length; i++) {
-                    
-                    $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + comments[i] + '.json')
-                        .fail(function () {
-                            dfd.reject()
-                        })
-                        .done(function (json2) {
-                            var newComment = new Comment(json2.by, json2.text, []);
-                            
-                            nTree.push(newComment);
-                            // if we have sub children
-                            if (json2.kids !== undefined && json2.kids.length > 0) {
-
-                                loadCommentsTree(json2.kids).done(function (data) {
-                                    newComment.items = data;
-                                });
-                            }
-                       
-                        });
-
-                }
-                setTimeout(function () {
-                    dfd.resolve(nTree)
-                }, 2000);
-                return dfd.promise();
-            }
-
-
-            var renderHomepage = function () {
-                limit_start = 0;
-                $app.html(postsTemplate());
-                var $ph = $("#posts");
-                loadStories($ph, 'top', 0, 20);
-                $("#ptype").change(function () {
-                    $ph.empty();
-                    loadStories($ph, $(this).val(), limit_start, limit_start + 20);
+                
+                Handlebars.registerHelper('pluralCommentCount', function (number, singular, plural) {
+                    return number + ' ' + Handlebars.helpers.pluralize.apply(this, arguments);
                 });
-                $app.find("#loadmore").click(function (e) {
-                    e.preventDefault();
-                    limit_start += 10;
-                    loadStories($ph, $("#ptype").val(), limit_start, limit_start + 20).done(function () {
-                        $('html, body').scrollTop($(document).height());
-                    });
-                });
-            }
-            var renderComments = function (id, comments) {
-                $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + id + '.json', function (json2) {
-                    $app.html(commentsTemplate(json2));
-                    var $ph = $("#comments");
-                    loadComments($ph, comments);
-                    $("#back").click(function () {
-                        renderHomepage();
-                    });
-                });
-            }
-            $("#logo").click(function () {
-                renderHomepage();
-            });
-            renderHomepage();
+                
+                var postsTemplate = Handlebars.compile(document.getElementById("posts-template").innerHTML);
+                var postTemplate = Handlebars.compile(document.getElementById("post-template").innerHTML);
+                var commentsTemplate = Handlebars.compile(document.getElementById("comments-template").innerHTML);
+                var commentTemplate = Handlebars.compile(document.getElementById("commenttemplate").innerHTML);
+                var commentNested = Handlebars.compile(document.getElementById("commentnested").innerHTML);
+                Handlebars.registerPartial('commentnested', commentNested);
         </script>
 </body>
 
