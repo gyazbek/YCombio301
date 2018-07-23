@@ -39,10 +39,6 @@ h6 {
   font-weight: 700;
 }
 
-.about-link {
-  margin-left: 150px;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -100,6 +96,7 @@ input[type=text] {
 }
 
 .logo {
+  cursor: pointer;
   font-size: 1.4em;
   font-weight: bolder;
   text-shadow: 1px 2px 2px #da8585;
@@ -296,4 +293,43 @@ section {
 hr {
   border: 0;
   border-top: 1px solid #ccc;
+}
+
+ul.tree, ul.tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.tree ul {
+  margin-left: 10px;
+}
+
+ul.tree li {
+  margin: 0;
+  padding: 0 7px;
+  line-height: 20px;
+  color: #555657;
+  font-weight: bold;
+  border-left: 1px solid #646464;
+}
+
+ul.tree li:last-child {
+  border-left: none;
+}
+
+ul.tree li:before {
+  position: relative;
+  top: -0.3em;
+  height: 2em;
+  width: 14px;
+  color: white;
+  border-bottom: 1px solid #a7a5a5;
+  content: "";
+  display: inline-block;
+  left: -7px;
+}
+
+ul.tree li:last-child:before {
+  border-left: 1px solid #646464;
 }
