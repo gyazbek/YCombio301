@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -13,19 +14,17 @@
 <body>
     <header>
         <nav>
-            <span class="logo left">YCombio</span>
+            <span id="logo" class="logo left">YCombio</span>
             <a class="modal-link about-link" data-modal-ref="about" href="#about">About</a>
-            <input class="right search" type="text" placeholder="Search"/>
         </nav>
     </header>
     <main>
         <section>
             <div id="app" class="container">
-
             </div>
         </section>
     </main>
-    
+
     <div class="modal" id="about">
         <div class="container">
             <div class="header">
@@ -35,8 +34,8 @@
             <hr>
             <div class="content">
                 <p>
-                    Hi there. I am Gui Yazbek, and this website is a project for the 201d43 class demonstrating the use of HTML, CSS, and JavaScript
-                    to build for the modern web.
+                    Hi there. I am Gui Yazbek, and this website is a project for the 301 class demonstrating the use of HTML, CSS, and JavaScript,
+                    frameworks and tools to build for the modern web.
                 </p>
             </div>
         </div>
@@ -47,144 +46,195 @@
 
     <script id="posts-template" type="text/x-handlebars-template">
         <div class="filter">
-            <label for="ptype">Viewing <select id="ptype">
-                <option value="top">Top</option>
-                <option value="new">Newest</option>
-                <option value="best">Best</option></select></label>
-            </div>
-            <div class="posts" id="posts">
-            </div>
-            <div class="loadmore">
-                <a href="">Load More</a>   
-            </div>
+            <label for="ptype">Viewing
+                <select id="ptype">
+                    <option value="top">Top</option>
+                    <option value="new">Newest</option>
+                    <option value="best">Best</option>
+                </select>
+            </label>
+        </div>
+        <div class="posts" id="posts">
+        </div>
+        <div class="loadmore">
+            <a id="loadmore" href="#">Load More</a>
+        </div>
     </script>
     <script id="post-template" type="text/x-handlebars-template">
         <div class="post">
             <span class="score">{{score}}</span>
             <div class="header">
-                <div class="title"><a href="{{url}}">{{title}}</a></div>
-                <div class="links"><a href="#" class="load-comments-link">{{pluralCommentCount descendants 'comment' 'comments'}}</a> | {{by}}</div>
-          </div>
+                <div class="title">
+                    <a href="{{url}}">{{title}}</a>
+                </div>
+                <div class="links">
+                    <a href="#" class="load-comments-link">{{pluralCommentCount descendants 'comment' 'comments'}}</a> | {{by}}</div>
+            </div>
         </div>
     </script>
-    <script id="comment-template" type="text/x-handlebars-template">
 
+    <script id="commentnested" type="text/x-handlebars-template">
         {{#each items}}
-        <li>
-            {{text}}
-            {{#if items}}
-            <ul>
-            {{> comment-template}}
-            </ul>
-            {{/if}}
-        </li>
+        <ul class="tree">
+            <li>
+                <b>{{by}}</b> - {{{text}}} {{> commentnested }}
+            </li>
+        </ul>
         {{/each}}
     </script>
-    <script id="comments-template" type="text/x-handlebars-template">
-        <div class="post">
+
+    <ul class="tree" id="comments">
+
+        <script id="commenttemplate" type="text/x-handlebars-template">
+            {{#each items}}
+            <li>
+                <b>{{by}}</b> - {{{text}}} {{> commentnested }}
+            </li>
+            {{/each}}
+        </script>
+        <script id="comments-template" type="text/x-handlebars-template">
+            <a href="#" id="back">Back</a>
+            <div class="post">
                 <span class="score">{{score}}</span>
                 <div class="header">
-                    <div class="title"><a href="{{url}}">{{title}}</a></div>
+                    <div class="title">
+                        <a href="{{url}}">{{title}}</a>
+                    </div>
                     <div class="links">{{pluralCommentCount descendants 'comment' 'comments'}} | {{by}}</div>
-              </div>
-        </div>
-        <ul id="comments">
-        </ul>
-    </script>
-    <script>
-
-        Handlebars.registerHelper('pluralize', function(number, singular, plural) {
-            if (number === 1)
-                return singular;
-            else
-                return (typeof plural === 'string' ? plural : singular + 's');
-        });
-            
-        Handlebars.registerHelper('pluralCommentCount', function(number, singular, plural) {    
-            return number+' '+Handlebars.helpers.pluralize.apply(this, arguments);
-        });
-
-        var $app = $("#app");
-        var postsTemplate = Handlebars.compile(document.getElementById("posts-template").innerHTML);
-        var postTemplate = Handlebars.compile(document.getElementById("post-template").innerHTML);
-        var commentsTemplate = Handlebars.compile(document.getElementById("comments-template").innerHTML);
-        var commentTemplate = Handlebars.compile(document.getElementById("comment-template").innerHTML);
-
-        
-        loadStories = function(container, type, start, end){
-            $.getJSON('https://hacker-news.firebaseio.com/v0/' + type + 'stories.json', function(json) {
-                for (var i = start; i < Math.min(json.length, end); i++) {
-                    (function(i) {
-                        $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + json[i] + '.json', function(json2) {
-                            var $post = $(postTemplate(json2));
-                            
-                            $post.find(".load-comments-link").click(function() {
-                                renderComments(json[i], json2.kids);
-                            });
-                            container.append($post);
-                            
-                        });
-                    })(i);
-                }
-            });
-        }
-
-        loadComments = function(container, comments){
-
-            loadCommentsTree(comments).done(function (data){
-                var items = loadCommentsTree(comments.slice(0));
-                console.log(data);
-                container.append(commentTemplate({ items: data }));
+                </div>
+            </div>
+            <ul class="tree" id="comments">
+            </ul>
+        </script>
+        <script>
+            Handlebars.registerHelper('pluralize', function (number, singular, plural) {
+                if (number === 1)
+                    return singular;
+                else
+                    return (typeof plural === 'string' ? plural : singular + 's');
             });
 
+            Handlebars.registerHelper('pluralCommentCount', function (number, singular, plural) {
+                return number + ' ' + Handlebars.helpers.pluralize.apply(this, arguments);
+            });
 
-        }
+            var $app = $("#app");
+            var postsTemplate = Handlebars.compile(document.getElementById("posts-template").innerHTML);
+            var postTemplate = Handlebars.compile(document.getElementById("post-template").innerHTML);
+            var commentsTemplate = Handlebars.compile(document.getElementById("comments-template").innerHTML);
+            var commentTemplate = Handlebars.compile(document.getElementById("commenttemplate").innerHTML);
+            var commentNested = Handlebars.compile(document.getElementById("commentnested").innerHTML);
 
-        loadCommentsTree = function(comments){
-            var dfd = new $.Deferred();
-            var nTree = [];
-            for (var i = 0; i < comments.length; i++) {
-                (function(i) {
-                $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + comments[i] + '.json')
-                .fail(function(jqXHR, textStatus, errorThrown){dfd.reject(jqXHR, textStatus, errorThrown)})
-                .done(function(json2) {
-                    if (json2.kids !== undefined && json2.kids.length > 0){
-                        loadCommentsTree(json2.kids, false).done(function(data){
-                            json2.items = data
-                        });
-                    }
-                    nTree.push(json2);
-                    if(i == comments.length - 1){
-                        dfd.resolve(nTree);
-                        
+
+            Handlebars.registerPartial('commentnested', commentNested);
+
+            var limit_start = 0;
+
+            loadStories = function (container, type, start, end) {
+                var dfd = new $.Deferred();
+                var totalCount = 0;
+                $.getJSON('https://hacker-news.firebaseio.com/v0/' + type + 'stories.json', function (json) {
+                    totalCount += Math.min(json.length, end - start);
+                    for (var i = start; i < Math.min(json.length, end); i++) {
+                        (function (i) {
+                            $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + json[i] + '.json',
+                                function (json2) {
+                                    var $post = $(postTemplate(json2));
+                                    $post.find(".load-comments-link").click(function () {
+                                        renderComments(json[i], json2.kids);
+                                    });
+                                    container.append($post);
+                                    totalCount -= 1;
+                                    if (totalCount == 0) {
+                                        dfd.resolve();
+                                    }
+                                });
+                        })(i);
                     }
                 });
-            })(i);
+                return dfd.promise();
             }
-            
-            return dfd.promise();
-        }
+
+            loadComments = function (container, comments) {
+                if (comments && comments.length > 0) {
+                    loadCommentsTree(comments).done(function (data) {
+                        console.log(data);
+                        container.append(commentTemplate({
+                            items: data
+                        }));
+                    });
+                }
+            }
+
+            function Comment(by, text, items) {
+                this.by = by;
+                this.text = text;
+                this.items = items;
+            }
+
+            loadCommentsTree = function (comments) {
+                var dfd = new $.Deferred();
+                var nTree = [];
+                for (var i = 0; i < comments.length; i++) {
+                    
+                    $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + comments[i] + '.json')
+                        .fail(function () {
+                            dfd.reject()
+                        })
+                        .done(function (json2) {
+                            var newComment = new Comment(json2.by, json2.text, []);
+                            
+                            nTree.push(newComment);
+                            // if we have sub children
+                            if (json2.kids !== undefined && json2.kids.length > 0) {
+
+                                loadCommentsTree(json2.kids).done(function (data) {
+                                    newComment.items = data;
+                                });
+                            }
+                       
+                        });
+
+                }
+                setTimeout(function () {
+                    dfd.resolve(nTree)
+                }, 2000);
+                return dfd.promise();
+            }
 
 
-        var renderHomepage = function(){
-            $app.html(postsTemplate());
-            var $ph = $("#posts");
-            loadStories($ph,'top', 0, 20);
-            $( "#ptype" ).change(function() {
-                $ph.empty();
-                loadStories($ph,$( this ).val(), 0, 20);
+            var renderHomepage = function () {
+                limit_start = 0;
+                $app.html(postsTemplate());
+                var $ph = $("#posts");
+                loadStories($ph, 'top', 0, 20);
+                $("#ptype").change(function () {
+                    $ph.empty();
+                    loadStories($ph, $(this).val(), limit_start, limit_start + 20);
+                });
+                $app.find("#loadmore").click(function (e) {
+                    e.preventDefault();
+                    limit_start += 10;
+                    loadStories($ph, $("#ptype").val(), limit_start, limit_start + 20).done(function () {
+                        $('html, body').scrollTop($(document).height());
+                    });
+                });
+            }
+            var renderComments = function (id, comments) {
+                $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + id + '.json', function (json2) {
+                    $app.html(commentsTemplate(json2));
+                    var $ph = $("#comments");
+                    loadComments($ph, comments);
+                    $("#back").click(function () {
+                        renderHomepage();
+                    });
+                });
+            }
+            $("#logo").click(function () {
+                renderHomepage();
             });
-        }
-
-        var renderComments = function(id, comments){
-            $.getJSON('https://hacker-news.firebaseio.com/v0/item/' + id + '.json', function(json2) {
-                $app.html(commentsTemplate(json2));
-                var $ph = $("#comments");
-                loadComments($ph,comments);
-            });
-        }
-
-        renderHomepage();
-    </script>
+            renderHomepage();
+        </script>
 </body>
+
 </html>
